@@ -37,12 +37,12 @@ public class User {
         return BCrypt.checkpw(password, this.password);
     }
 
-    private void addRole(Role role) {
+    public void addRole(Role role) {
         roles.add(role);
         role.getUsers().add(this);
     }
 
-    private void removeRole(Role role) {
+    public void removeRole(Role role) {
         roles.remove(role);
         role.getUsers().remove(this);
     }

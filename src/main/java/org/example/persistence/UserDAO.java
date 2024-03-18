@@ -22,6 +22,12 @@ public class UserDAO implements ISecurityDAO{
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         User user = new User(username, password);
+        Role userRole = em.find(Role.class, "user");
+        if (userRole == null) {
+            userRole = new Role("user");
+            em.persist(userRole);
+        }
+        user.addRole(userRole);
         em.persist(user);
         em.getTransaction().commit();
         em.close();
@@ -40,11 +46,11 @@ public class UserDAO implements ISecurityDAO{
     public static void main(String[] args) {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
         UserDAO dao = new UserDAO(emf);
-//        User user = dao.createUser("holger", "1234");
+//        User user = dao.createUser("Henrik", "1234");
 //        System.out.println(user.getUsername());
         try {
-            User user = dao.verifyUser("hilger", "1234");
-            System.out.println(user.getUsername());
+            User verifiedUser = dao.verifyUser("Henrik", "1234");
+            System.out.println(verifiedUser.getUsername());
         } catch (EntityNotFoundException e) {
             e.printStackTrace();
         }
