@@ -8,3 +8,17 @@ POST http://localhost:7007/person
 }
 ###
 GET http://localhost:7007/person/Pedro
+
+###
+POST http://localhost:7070/api/auth/login
+
+{
+"username": "Henrik",
+"password": "1234"
+}
+
+###
+
+GET http://localhost:7070/api/protected/user_demo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJUaG9tYXMgSGFydG1hbm4iLCJzdWIiOiJIZW5yaWsiLCJleHAiOjE3MTA3NjE3OTIsInJvbGVzIjoiLHVzZXIiLCJ1c2VybmFtZSI6IkhlbnJpayJ9.qRs_Y_PjjZ4jPtRmSF8sbY_xiuvm3symruNGdUtaMq8
+

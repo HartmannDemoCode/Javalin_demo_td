@@ -17,6 +17,7 @@
         <restassured.version>5.3.0</restassured.version>
         <hibernate.version>6.2.4.Final</hibernate.version>
         <postgresql.version>42.6.0</postgresql.version>
+        <nimbus.version>9.10</nimbus.version>
         <db.name>todelete</db.name>
     </properties>
 
@@ -95,6 +96,11 @@
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>${nimbus.version}</version>
         </dependency>
 
     </dependencies>

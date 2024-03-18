@@ -4,6 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;
+import io.javalin.http.HttpStatus;
+import org.example.controllers.ISecurityController;
+import org.example.controllers.SecurityController;
+import org.example.dtos.UserDTO;
+import org.example.exceptions.ApiException;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Purpose:
@@ -12,6 +20,7 @@ import io.javalin.apibuilder.EndpointGroup;
  */
 public class ApplicationConfig {
     ObjectMapper om = new ObjectMapper();
+    ISecurityController securityController = new SecurityController();
     private Javalin app;
     private static ApplicationConfig instance;
     private ApplicationConfig(){}
@@ -27,6 +36,36 @@ public class ApplicationConfig {
         config.routing.contextPath = "/api";
         });
 
+        return instance;
+    }
+
+    public ApplicationConfig checkSecurityRoles() {
+        // Check roles on the user (ctx.attribute("username") and compare with permittedRoles using securityController.authorize()
+        app.updateConfig(config -> {
+
+            config.accessManager((handler, ctx, permittedRoles) -> {
+                // permitted roles are defined in the last arg to routes: get("/", ctx -> ctx.result("Hello World"), Role.ANYONE);
+
+                Set<String> allowedRoles = permittedRoles.stream().map(role -> role.toString().toUpperCase()).collect(Collectors.toSet());
+                if(allowedRoles.contains("ANYONE") || ctx.method().toString().equals("OPTIONS")) {
+                    // Allow requests from anyone and OPTIONS requests (preflight in CORS)
+                    handler.handle(ctx);
+                    return;
+                }
+
+                UserDTO user = ctx.attribute("user");
+                System.out.println("USER IN CHECK_SEC_ROLES: "+user);
+                if(user == null)
+                    ctx.status(HttpStatus.FORBIDDEN)
+                            .json(om.createObjectNode()
+                                    .put("msg","Not authorized. No username were added from the token"));
+
+                if (securityController.authorize(user, allowedRoles))
+                    handler.handle(ctx);
+                else
+                    throw new ApiException(HttpStatus.FORBIDDEN.getCode(), "Unauthorized with roles: "+allowedRoles);
+            });
+        });
         return instance;
     }
     public ApplicationConfig startServer(int port){
